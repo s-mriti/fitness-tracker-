@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IndoGulf · Wellness Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --coral:#F5A99A; --sage:#87C992; --indigo:#2A3578; --purple:#5B3A9E;
+  --ink:#1c2034; --muted:#6a7088; --line:#e7e3f0; --paper:#FBFAF7; --card:#ffffff;
+  --shadow:0 1px 2px rgba(42,53,120,.05),0 8px 24px rgba(42,53,120,.06);
+  --display:'Fraunces',Georgia,serif; --body:'Inter',system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--body);background:var(--paper);color:var(--ink);line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:920px;margin:0 auto;padding:0 18px 80px}
+
+/* header */
+header{padding:30px 0 18px;display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.brand{display:flex;flex-direction:column;gap:2px}
+.brand .ey{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--purple);font-weight:600}
+.brand h1{font-family:var(--display);font-weight:500;font-size:30px;letter-spacing:-.01em}
+.brand h1 span{color:var(--coral)}
+.who{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)}
+.who b{color:var(--ink)}
+.who button{border:1px solid var(--line);background:var(--card);border-radius:99px;padding:6px 13px;font:inherit;font-size:12px;color:var(--muted);cursor:pointer}
+.who button:hover{border-color:var(--purple);color:var(--purple)}
+
+/* login — calm water */
+.gate{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:18px;
+  background:radial-gradient(120% 100% at 50% 0%,#cfe8f7 0%,#a9d2f0 45%,#6fa8d8 100%);overflow:hidden}
+.gate .water{position:absolute;inset:0;z-index:0;pointer-events:none}
+/* concentric ripples */
+.ripple{position:absolute;left:50%;top:42%;border:1.5px solid rgba(20,40,90,.55);border-radius:50%;
+  width:40px;height:40px;transform:translate(-50%,-50%) scale(0);opacity:0;animation:ripple 6s ease-out infinite}
+.ripple:nth-child(2){animation-delay:2s;border-color:rgba(15,30,75,.45)}
+.ripple:nth-child(3){animation-delay:4s;border-color:rgba(10,25,60,.4)}
+@keyframes ripple{0%{transform:translate(-50%,-50%) scale(0);opacity:.85}80%{opacity:.12}100%{transform:translate(-50%,-50%) scale(16);opacity:0}}
+/* drifting light reflections */
+.shimmer{position:absolute;border-radius:50%;filter:blur(40px);opacity:.5;animation:drift 14s ease-in-out infinite alternate}
+.shimmer.a{width:280px;height:280px;background:rgba(135,201,146,.5);left:8%;top:18%}
+.shimmer.b{width:340px;height:340px;background:rgba(245,169,154,.4);right:6%;bottom:10%;animation-delay:-6s}
+.shimmer.c{width:220px;height:220px;background:rgba(91,58,158,.3);left:40%;bottom:-4%;animation-delay:-3s}
+@keyframes drift{from{transform:translate(0,0)}to{transform:translate(26px,-24px)}}
+.gatecard{position:relative;z-index:2;background:rgba(255,255,255,.72);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border:1px solid rgba(255,255,255,.7);border-radius:24px;box-shadow:0 20px 60px rgba(42,53,120,.16);
+  padding:40px 34px;max-width:380px;width:100%;text-align:center}
+.lotus{width:64px;height:64px;margin:0 auto 16px;display:block;animation:breathe 5s ease-in-out infinite;transform-origin:center}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+@media(prefers-reduced-motion:reduce){.ripple,.shimmer,.lotus{animation:none}}
+/* cursor water trail */
+.gate{cursor:default}
+.drop{position:absolute;z-index:1;border:1.5px solid rgba(20,40,90,.5);border-radius:50%;
+  transform:translate(-50%,-50%) scale(0);pointer-events:none;animation:drop 1.4s ease-out forwards}
+@keyframes drop{0%{transform:translate(-50%,-50%) scale(.15);opacity:.75;border-color:rgba(25,55,110,.65)}
+  100%{transform:translate(-50%,-50%) scale(1);opacity:0;border-color:rgba(10,25,60,.2)}}
+.gatecard h2{font-family:var(--display);font-weight:500;font-size:24px;margin-bottom:6px}
+.gatecard p{color:var(--muted);font-size:14px;margin-bottom:22px}
+.field{text-align:left;margin-bottom:14px}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--ink);margin-bottom:6px;letter-spacing:.02em}
+.field input,.field select{width:100%;border:1px solid var(--line);border-radius:11px;padding:12px 13px;font:inherit;font-size:15px;background:#fff;color:var(--ink)}
+.field input:focus,.field select:focus{outline:none;border-color:var(--purple);box-shadow:0 0 0 3px rgba(91,58,158,.12)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:none;border-radius:11px;padding:12px 18px;font:inherit;font-weight:600;font-size:14px;cursor:pointer;background:var(--indigo);color:#fff;width:100%;transition:transform .1s,background .2s}
+.btn:hover{background:var(--purple)}
+.btn:active{transform:scale(.99)}
+.btn.ghost{background:transparent;color:var(--purple);border:1px solid var(--line);width:auto;padding:9px 15px}
+.btn.ghost:hover{border-color:var(--purple);background:#faf7ff}
+
+/* stat strip */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:6px 0 26px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:var(--shadow)}
+.stat .n{font-family:var(--display);font-size:30px;font-weight:500;line-height:1}
+.stat .l{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:7px}
+.stat.s1 .n{color:var(--coral)} .stat.s2 .n{color:var(--sage)}
+.stat.s3 .n{color:var(--purple)} .stat.s4 .n{color:var(--indigo)}
+
+/* streak row */
+.streak{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px 20px;margin-bottom:24px;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}
+.streak .hd{display:flex;flex-direction:column;gap:3px}
+.streak .hd .t{font-family:var(--display);font-size:18px;font-weight:500}
+.streak .hd .d{font-size:13px;color:var(--muted)}
+.dots{display:flex;gap:7px}
+.dot{width:30px;height:30px;border-radius:9px;border:1.5px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted);font-weight:600;background:#fff}
+.dot.on{background:var(--sage);border-color:var(--sage);color:#fff}
+.dot.today{box-shadow:0 0 0 3px rgba(135,201,146,.25)}
+
+/* layout */
+.grid{display:grid;grid-template-columns:1.1fr .9fr;gap:22px;align-items:start}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);overflow:hidden}
+.panel h3{font-family:var(--display);font-weight:500;font-size:18px;padding:18px 20px 0}
+.panel .body{padding:16px 20px 20px}
+
+/* tabs */
+.tabs{display:flex;gap:6px;padding:14px 20px 0;flex-wrap:wrap}
+.tab{border:1px solid var(--line);background:#fff;border-radius:99px;padding:7px 14px;font:inherit;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer}
+.tab.active{background:var(--indigo);color:#fff;border-color:var(--indigo)}
+.tabpane{display:none} .tabpane.active{display:block}
+
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.muted-note{font-size:12px;color:var(--muted);margin-top:4px}
+
+/* log list */
+.logitem{display:flex;align-items:center;gap:13px;padding:13px 0;border-bottom:1px solid var(--line)}
+.logitem:last-child{border-bottom:none}
+.ic{width:40px;height:40px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:19px}
+.ic.yoga{background:#f3edff} .ic.swim{background:#e8f6ec} .ic.weight{background:#fdeeea}
+.logitem .meta{flex:1;min-width:0}
+.logitem .meta .a{font-weight:600;font-size:14px}
+.logitem .meta .b{font-size:12px;color:var(--muted)}
+.logitem .val{font-weight:600;font-size:13px;color:var(--indigo);white-space:nowrap}
+.del{border:none;background:none;color:var(--muted);cursor:pointer;font-size:16px;padding:2px 6px;border-radius:6px}
+.del:hover{color:var(--coral);background:#fdeeea}
+.empty{text-align:center;color:var(--muted);font-size:13px;padding:30px 10px}
+
+/* trend bars */
+.trend{display:flex;align-items:flex-end;gap:8px;height:120px;padding-top:8px}
+.bar{flex:1;background:linear-gradient(var(--sage),#a9d9b2);border-radius:6px 6px 0 0;min-height:4px;position:relative}
+.bar span{position:absolute;bottom:-20px;left:0;right:0;text-align:center;font-size:10px;color:var(--muted)}
+.weightline{font-size:13px;color:var(--muted);margin-top:26px}
+.weightline b{color:var(--ink);font-family:var(--display);font-size:17px}
+
+select.mini{border:1px solid var(--line);border-radius:8px;padding:5px 8px;font:inherit;font-size:12px;color:var(--muted);background:#fff}
+
+footer{text-align:center;color:var(--muted);font-size:12px;margin-top:38px}
+footer a{color:var(--purple);text-decoration:none}
+
+@media(max-width:760px){
+  .grid{grid-template-columns:1fr}
+  .stats{grid-template-columns:1fr 1fr}
+  .brand h1{font-size:25px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- LOGIN GATE -->
+  <div id="gate" class="gate">
+    <div class="water">
+      <div class="shimmer a"></div><div class="shimmer b"></div><div class="shimmer c"></div>
+      <div class="ripple"></div><div class="ripple"></div><div class="ripple"></div>
+    </div>
+    <div class="gatecard">
+      <svg class="lotus" viewBox="0 0 64 64" fill="none">
+        <path d="M32 54c-13-2-22-9-22-9s2-12 11-15c0 0-4 9 0 17 0 0-7-13 0-23 0 0 6 7 6 18 0-11 6-18 6-18 7 10 0 23 0 23 4-8 0-17 0-17 9 3 11 15 11 15s-9 7-22 9z" fill="#87C992" opacity=".9"/>
+        <path d="M32 48c0-12 5-22 5-22s-5 4-5 14c0-10-5-14-5-14s5 10 5 22z" fill="#5B3A9E" opacity=".55"/>
+      </svg>
+      <h2>Wellness Tracker</h2>
+      <p>Log your practice across land &amp; water. Enter your name to begin — your progress stays on this device.</p>
+      <div class="field">
+        <label for="cname">Your name</label>
+        <input id="cname" type="text" placeholder="e.g. Aisha" autocomplete="name">
+      </div>
+      <button class="btn" onclick="login()">Open my tracker</button>
+    </div>
+  </div>
+
+  <!-- APP -->
+  <div id="app" style="display:none">
+    <header>
+      <div class="brand">
+        <div class="ey">IndoGulf Yoga &amp; Wellness</div>
+        <h1>Wellness <span>Tracker</span></h1>
+      </div>
+      <div class="who">
+        <span>Logged as <b id="whoName"></b></span>
+        <button onclick="logout()">Switch</button>
+      </div>
+    </header>
+
+    <!-- stats -->
+    <div class="stats">
+      <div class="stat s1"><div class="n" id="stStreak">0</div><div class="l">Day streak</div></div>
+      <div class="stat s2"><div class="n" id="stSessions">0</div><div class="l">Sessions logged</div></div>
+      <div class="stat s3"><div class="n" id="stMins">0</div><div class="l">Total minutes</div></div>
+      <div class="stat s4"><div class="n" id="stWeight">—</div><div class="l">Latest weight</div></div>
+    </div>
+
+    <!-- streak -->
+    <div class="streak">
+      <div class="hd">
+        <div class="t">Daily check-in</div>
+        <div class="d" id="streakMsg">Mark today once you've moved, breathed, or stretched.</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+        <div class="dots" id="weekDots"></div>
+        <button class="btn ghost" id="checkBtn" onclick="checkIn()">Check in today</button>
+      </div>
+    </div>
+
+    <div class="grid">
+      <!-- LEFT: log -->
+      <div class="panel">
+        <div class="tabs">
+          <button class="tab active" data-t="yoga" onclick="setTab('yoga')">Yoga &amp; Breath</button>
+          <button class="tab" data-t="swim" onclick="setTab('swim')">Aquatic</button>
+          <button class="tab" data-t="weight" onclick="setTab('weight')">Body</button>
+        </div>
+        <div class="body">
+          <!-- yoga -->
+          <div class="tabpane active" id="pane-yoga">
+            <div class="field"><label>Session type</label>
+              <select id="y_type">
+                <option>Hatha Yoga</option><option>Vinyasa Flow</option><option>Prenatal Yoga</option>
+                <option>Pranayama / Breathwork</option><option>Meditation</option><option>Adaptive Wellness</option>
+              </select></div>
+            <div class="row2">
+              <div class="field"><label>Duration (min)</label><input id="y_min" type="number" min="1" placeholder="60"></div>
+              <div class="field"><label>How it felt (1–5)</label>
+                <select id="y_feel"><option value="5">★★★★★ Energised</option><option value="4">★★★★ Good</option><option value="3" selected>★★★ Steady</option><option value="2">★★ Tired</option><option value="1">★ Tough</option></select></div>
+            </div>
+            <button class="btn" onclick="addLog('yoga')">Log session</button>
+          </div>
+          <!-- swim -->
+          <div class="tabpane" id="pane-swim">
+            <div class="field"><label>Activity</label>
+              <select id="s_type">
+                <option>Lap Swimming</option><option>Aqua Aerobics</option><option>Water Safety / Coaching</option>
+                <option>Aquatic Therapy</option><option>Deep-water Running</option>
+              </select></div>
+            <div class="row2">
+              <div class="field"><label>Duration (min)</label><input id="s_min" type="number" min="1" placeholder="45"></div>
+              <div class="field"><label>Distance (m)</label><input id="s_dist" type="number" min="0" placeholder="800"></div>
+            </div>
+            <button class="btn" onclick="addLog('swim')">Log session</button>
+          </div>
+          <!-- weight -->
+          <div class="tabpane" id="pane-weight">
+            <div class="row2">
+              <div class="field"><label>Weight (kg)</label><input id="w_kg" type="number" min="1" step="0.1" placeholder="68.5"></div>
+              <div class="field"><label>Resting HR (opt.)</label><input id="w_hr" type="number" min="30" placeholder="62"></div>
+            </div>
+            <p class="muted-note">Logged with today's date. Your trend appears on the right.</p>
+            <button class="btn" onclick="addLog('weight')" style="margin-top:12px">Save metric</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: insights -->
+      <div class="panel">
+        <h3>Body trend</h3>
+        <div class="body" style="padding-bottom:8px">
+          <div id="weightTrend"></div>
+          <div class="weightline" id="weightSummary">No weight entries yet.</div>
+        </div>
+        <h3 style="border-top:1px solid var(--line);margin-top:6px;padding-top:18px">Recent activity</h3>
+        <div class="body" style="padding-top:8px">
+          <div style="display:flex;justify-content:flex-end;margin-bottom:4px">
+            <select class="mini" id="filter" onchange="renderLogs()">
+              <option value="all">All</option><option value="yoga">Yoga &amp; Breath</option>
+              <option value="swim">Aquatic</option><option value="weight">Body</option>
+            </select>
+          </div>
+          <div id="logList"></div>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      IndoGulf Yoga &amp; Wellness · Bahrain &nbsp;•&nbsp; <a href="https://indogulfyoga.com">indogulfyoga.com</a><br>
+      Your data is stored privately in this browser.
+    </footer>
+  </div>
+</div>
+
+<script>
+let USER=null, DATA={checkins:[],logs:[]};
+
+function uget(k){try{const r=window.storage&&window.storage.get?null:null;}catch(e){} }
+// storage helpers (Artifact persistent storage if present, else localStorage)
+const hasWS = (typeof window!=='undefined' && window.storage && window.storage.get);
+async function save(){
+  const key='igw:'+USER.toLowerCase();
+  const val=JSON.stringify(DATA);
+  if(hasWS){ try{await window.storage.set(key,val);return;}catch(e){} }
+  try{localStorage.setItem(key,val);}catch(e){}
+}
+async function load(name){
+  const key='igw:'+name.toLowerCase();
+  if(hasWS){ try{const r=await window.storage.get(key); if(r&&r.value) return JSON.parse(r.value);}catch(e){} }
+  try{const r=localStorage.getItem(key); if(r) return JSON.parse(r);}catch(e){}
+  return {checkins:[],logs:[]};
+}
+function rememberUser(n){try{localStorage.setItem('igw:last',n);}catch(e){}}
+function lastUser(){try{return localStorage.getItem('igw:last');}catch(e){return null;}}
+
+const todayStr=()=> new Date().toISOString().slice(0,10);
+function dayKey(d){return d.toISOString().slice(0,10);}
+
+async function login(){
+  const n=document.getElementById('cname').value.trim();
+  if(!n){document.getElementById('cname').focus();return;}
+  USER=n; rememberUser(n);
+  DATA=await load(n);
+  document.getElementById('gate').style.display='none';
+  document.getElementById('app').style.display='block';
+  document.getElementById('whoName').textContent=n;
+  renderAll();
+}
+function logout(){
+  USER=null; document.getElementById('app').style.display='none';
+  document.getElementById('gate').style.display='flex';
+  document.getElementById('cname').value='';
+}
+
+function setTab(t){
+  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.t===t));
+  document.querySelectorAll('.tabpane').forEach(x=>x.classList.remove('active'));
+  document.getElementById('pane-'+t).classList.add('active');
+}
+
+async function addLog(type){
+  let entry={type,date:todayStr(),ts:Date.now()};
+  if(type==='yoga'){
+    const m=+document.getElementById('y_min').value;
+    if(!m){document.getElementById('y_min').focus();return;}
+    entry.label=document.getElementById('y_type').value; entry.min=m; entry.feel=+document.getElementById('y_feel').value;
+    document.getElementById('y_min').value='';
+  }else if(type==='swim'){
+    const m=+document.getElementById('s_min').value;
+    if(!m){document.getElementById('s_min').focus();return;}
+    entry.label=document.getElementById('s_type').value; entry.min=m; entry.dist=+document.getElementById('s_dist').value||0;
+    document.getElementById('s_min').value=''; document.getElementById('s_dist').value='';
+  }else if(type==='weight'){
+    const w=+document.getElementById('w_kg').value;
+    if(!w){document.getElementById('w_kg').focus();return;}
+    entry.label='Body metric'; entry.kg=w; entry.hr=+document.getElementById('w_hr').value||0;
+    document.getElementById('w_kg').value=''; document.getElementById('w_hr').value='';
+  }
+  DATA.logs.unshift(entry);
+  // any logged session also counts as a check-in for the day
+  if(!DATA.checkins.includes(entry.date)) DATA.checkins.push(entry.date);
+  await save(); renderAll();
+}
+
+async function delLog(ts){
+  DATA.logs=DATA.logs.filter(l=>l.ts!==ts);
+  await save(); renderAll();
+}
+
+async function checkIn(){
+  const t=todayStr();
+  if(!DATA.checkins.includes(t)){DATA.checkins.push(t); await save();}
+  renderAll();
+}
+
+function computeStreak(){
+  const set=new Set(DATA.checkins);
+  let s=0; let d=new Date();
+  // if today not checked, streak counts back from yesterday
+  if(!set.has(dayKey(d))) d.setDate(d.getDate()-1);
+  while(set.has(dayKey(d))){s++; d.setDate(d.getDate()-1);}
+  return s;
+}
+
+function renderAll(){renderStats();renderStreak();renderTrend();renderLogs();}
+
+function renderStats(){
+  const sessions=DATA.logs.filter(l=>l.type!=='weight');
+  document.getElementById('stStreak').textContent=computeStreak();
+  document.getElementById('stSessions').textContent=sessions.length;
+  document.getElementById('stMins').textContent=sessions.reduce((a,l)=>a+(l.min||0),0);
+  const w=DATA.logs.filter(l=>l.type==='weight').sort((a,b)=>b.ts-a.ts)[0];
+  document.getElementById('stWeight').textContent=w?w.kg+' kg':'—';
+}
+
+function renderStreak(){
+  const wrap=document.getElementById('weekDots'); wrap.innerHTML='';
+  const set=new Set(DATA.checkins); const labels=['S','M','T','W','T','F','S'];
+  const today=new Date();
+  for(let i=6;i>=0;i--){
+    const d=new Date(); d.setDate(today.getDate()-i);
+    const on=set.has(dayKey(d));
+    const isToday=i===0;
+    const el=document.createElement('div');
+    el.className='dot'+(on?' on':'')+(isToday?' today':'');
+    el.textContent=labels[d.getDay()];
+    el.title=dayKey(d);
+    wrap.appendChild(el);
+  }
+  const done=set.has(todayStr());
+  document.getElementById('checkBtn').textContent=done?'Checked in ✓':'Check in today';
+  document.getElementById('checkBtn').disabled=done;
+  document.getElementById('checkBtn').style.opacity=done?'.6':'1';
+  const s=computeStreak();
+  document.getElementById('streakMsg').textContent = s>0
+    ? `${s} day${s>1?'s':''} in a row — keep the flow going.`
+    : 'Mark today once you\u2019ve moved, breathed, or stretched.';
+}
+
+function renderTrend(){
+  const w=DATA.logs.filter(l=>l.type==='weight').sort((a,b)=>a.ts-b.ts);
+  const box=document.getElementById('weightTrend');
+  const sum=document.getElementById('weightSummary');
+  if(w.length===0){box.innerHTML='<div class="empty">Log body metrics to see your trend.</div>';sum.textContent='No weight entries yet.';return;}
+  const recent=w.slice(-7);
+  const vals=recent.map(x=>x.kg); const min=Math.min(...vals),max=Math.max(...vals);
+  const range=(max-min)||1;
+  box.innerHTML='<div class="trend">'+recent.map(x=>{
+    const h=20+((x.kg-min)/range)*80;
+    return `<div class="bar" style="height:${h}%" title="${x.kg}kg on ${x.date}"><span>${x.date.slice(5)}</span></div>`;
+  }).join('')+'</div>';
+  const first=w[0].kg, last=w[w.length-1].kg, diff=(last-first).toFixed(1);
+  const arrow = diff>0?`+${diff}`:diff;
+  sum.innerHTML=`Latest <b>${last} kg</b> · ${w.length} entr${w.length>1?'ies':'y'} · net ${arrow} kg since start`;
+}
+
+function renderLogs(){
+  const f=document.getElementById('filter').value;
+  const list=document.getElementById('logList');
+  let items=DATA.logs.slice().sort((a,b)=>b.ts-a.ts);
+  if(f!=='all') items=items.filter(l=>l.type===f);
+  if(items.length===0){list.innerHTML='<div class="empty">No entries yet — log your first above.</div>';return;}
+  const icons={yoga:'🧘',swim:'🌊',weight:'⚖️'};
+  list.innerHTML=items.slice(0,40).map(l=>{
+    let val='';
+    if(l.type==='yoga') val=`${l.min} min · ${'★'.repeat(l.feel)}`;
+    else if(l.type==='swim') val=`${l.min} min${l.dist?' · '+l.dist+'m':''}`;
+    else val=`${l.kg} kg${l.hr?' · '+l.hr+'bpm':''}`;
+    return `<div class="logitem">
+      <div class="ic ${l.type}">${icons[l.type]}</div>
+      <div class="meta"><div class="a">${l.label}</div><div class="b">${l.date}</div></div>
+      <div class="val">${val}</div>
+      <button class="del" title="Delete" onclick="delLog(${l.ts})">×</button>
+    </div>`;
+  }).join('');
+}
+
+// prefill last user
+window.addEventListener('DOMContentLoaded',()=>{
+  const lu=lastUser(); if(lu) document.getElementById('cname').value=lu;
+  document.getElementById('cname').addEventListener('keydown',e=>{if(e.key==='Enter')login();});
+
+  // cursor water trail (login screen only)
+  const gate=document.getElementById('gate');
+  const reduce=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  let last=0;
+  function makeDrop(x,y,size){
+    const r=gate.getBoundingClientRect();
+    const d=document.createElement('div');
+    d.className='drop';
+    const s=size||(34+Math.random()*46);
+    d.style.left=(x-r.left)+'px'; d.style.top=(y-r.top)+'px';
+    d.style.width=s+'px'; d.style.height=s+'px';
+    gate.appendChild(d);
+    setTimeout(()=>d.remove(),1400);
+  }
+  if(!reduce){
+    gate.addEventListener('pointermove',e=>{
+      const now=Date.now(); if(now-last<70) return; last=now;   // throttle
+      makeDrop(e.clientX,e.clientY);
+    });
+    gate.addEventListener('pointerdown',e=>makeDrop(e.clientX,e.clientY,90)); // bigger splash on click
+  }
+});
+</script>
+</body>
+</html>
